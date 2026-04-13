@@ -1,0 +1,190 @@
+{
+  "name": "AI News Digest Final",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an AI news digest generator. Be fast and efficient.\n\nSTEP 1 — FETCH\nCall GetNews once with the user's requested topic keywords.\n\nSTEP 2 — FILTER\nKeep only articles where title AND url exist.\nRemove obvious duplicates (same title).\nKeep max 8 best articles total.\n\nSTEP 3 — SCORE & RANK (do this mentally, no output needed)\nRank by: recency first, then relevance to topic.\n\nSTEP 4 — SUMMARISE (FAST MODE)\nFor each article write exactly 3 bullet points.\nEach bullet: 8-12 words with one concrete fact (number/date/company).\nDo NOT over-explain. Be telegraphic.\n\nSTEP 5 — BUILD EMAIL (use this exact template, fill in articles)\nGenerate a clean HTML email. Use only inline CSS.\nMax width 600px. White background. Arial font.\nFor each article:\n- Bold clickable title (href to article url)\n- Source name + published date on one line (gray, 12px)\n- 3 bullet points as <ul> list\nKeep total HTML under 4000 characters.\n\nSTEP 6 — SEND EMAIL\nCall sendMail with:\nsubject: \"News Digest: [TOPIC] - [TODAY'S DATE]\"\nhtml: the generated HTML\nto: the email address the user provided\n\nReturn: \"Done! Digest on [topic] sent to [email]. X articles covered.\"\n\n\nNote: In case of an gracefully tell that \"something went wrong, please try again!\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d88a8175-acb2-4f69-b274-e2440ea9f4c4",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        208
+      ],
+      "id": "537ac9ed-0d97-4d54-aa33-f7aec2632b1c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "sFwoQiHtvPF6qdvS",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        208
+      ],
+      "id": "bc5fcdd6-bff5-494f-acde-519313c71f25",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        560,
+        176
+      ],
+      "id": "37a9ddee-ae4c-45d9-b869-dd75353eda9a",
+      "name": "Send a message in Gmail",
+      "webhookId": "c065ad8f-007f-4a46-912e-6bf344f38038",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "mvbkJkqe4Pgl1ZY8",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://newsdata.io/api/1/latest?apikey=pub_ec9158f516e14db78fa51e4ee139e263",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters1_Value', `Keywords or a phrase to search for.`, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        368,
+        256
+      ],
+      "id": "c968e8f6-8688-472e-b16e-4237117a0f5b",
+      "name": "GetNews",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "hzuetBCQg3PZSNCO",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "availableInChat": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -352,
+        0
+      ],
+      "id": "eed31d45-126e-49c3-8672-4739db440861",
+      "name": "When chat message received",
+      "webhookId": "db30a81f-3f61-4c3e-af2e-bbe0a3915cfc"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetNews": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1b8cd427-4077-47ce-a2bf-91938937e26c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5ca724f1f10540ba48190563a580fc5bf0f0182e9545fde34c4790b9f02c908b"
+  },
+  "id": "c75T8xRlPRhVKIUw",
+  "tags": []
+}
