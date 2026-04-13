@@ -1,5 +1,7 @@
-# ainewsdigest
+# ainewsdigest 
 AI-driven news assistant that delivers personalized, clutter-free news summaries straight to your inbox.
+
+URL to test the feature: https://github.com/iamtusharchopra/ainewsdigest
 
 Overview
 
