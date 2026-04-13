@@ -26,10 +26,9 @@ Instead of scrolling through multiple sources, simply provide:
 🏗️ Tech Stack Workflow Automation: n8n (Self-hosted)
 
 Containerization: Docker
-
 AI Model: Gemini 2.5 Flash (for fast summarization)
-
 News Source API: NewsData.io (strong coverage, especially for Indian news)
+Cloudfare Tunnel: Cloudflare Tunnel is used to securely expose my self-hosted n8n webhooks to the internet.
 
 🔧 How It Works:
 1. User inputs a news topic + email ID
